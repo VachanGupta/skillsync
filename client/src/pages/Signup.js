@@ -10,14 +10,24 @@ function Signup() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('API URL:', process.env.REACT_APP_API_URL);
     try {
       const apiUrl = process.env.REACT_APP_API_URL;
       await axios.post(`${apiUrl}/api/auth/signup`, { email, password });
       setMsg('Signup successful! Redirecting to login...');
       setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
-      setMsg(err.response.data.msg || 'Signup failed');
-    }
+        if (err.response && err.response.data && err.response.data.msg) {
+          setMsg(err.response.data.msg);
+        } 
+        else if (err.request) {
+          setMsg('Network error: Could not connect to server. Is it running?');
+        } 
+        else {
+          setMsg('Signup failed. Please try again.');
+        }
+        console.error("Signup error:", err);
+      }
   };
 
   return (
